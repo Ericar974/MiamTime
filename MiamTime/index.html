@@ -3,19 +3,59 @@
     <meta http-equiv="content-type" content="text/html; charset=windows-1252">
     <title>MiamTime</title>
     <meta http-equiv="content-style-type" content="text/css">
-    <link rel="shortcut icon" type="image/x-icon" href="img/favicon.ico">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
           integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI="
           crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
             integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
             crossorigin=""></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body lang="">
-<div id="map"></div>
-<p>Salut</p>
+    <!--<div class="container">
+        <div>
+            <p>Liste resto</p>
+        </div>
+        <div id="map"></div>
+        <div>
+            <p>Room</p>
+        </div>
+    </div>-->
+
+    <div id="map"></div>
 </body>
 
 <script>
-    let map = L.map('map').setView([51.505, -0.09], 13);
+    let map = L.map('map').setView([48.8588, 2.3470], 15);
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+
+    /*var marker = L.marker([48.8588, 2.3470]).addTo(map);*/
+    var personnage = L.circle([48.8588, 2.3470], {
+        color: 'red',
+        fillColor: '#f03',
+        fillOpacity: 0.6,
+        radius: 35
+    }).addTo(map);
+    personnage.bindPopup("<b>Salut !</b><br>Je suis le personnage.").openPopup();
+
+    let restaurant = L.circle([48.8538, 2.3570], {
+        color: 'blue',
+        fillColor: '#3B41F4',
+        fillOpacity: 0.6,
+        radius: 35
+    }).addTo(map);
+    restaurant.bindPopup("<b>Le restaurant !").openPopup();
+
+    let lieuRdv = L.circle([48.8648, 2.3570], {
+        color: 'pink',
+        fillColor: '#E643C8',
+        fillOpacity: 0.6,
+        radius: 35
+    }).addTo(map);
+    lieuRdv.bindPopup("<b>Le lieu de rendez-vous !").openPopup();
+
+    let layer = L.polyline()
 </script>
