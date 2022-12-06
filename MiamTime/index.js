@@ -56,17 +56,12 @@ function action(A, resto) {
         }
     }
     console.log(A.name + ' est arrivé avec ses amis')
-    results.push(A.name + ' est arrivé au lieu de rendez vous en ' + i + 'min')
+    results.push(A.name + ' est arrivé au lieu de rendez vous en ' + Math.trunc(i/60) + 'heure et ' + i%60  + 'min')
 }
 // ACTION
 action(persoA, listRestos.resto5)
 action(persoB, listRestos.resto5)
 action(persoC, listRestos.resto1)
 
-
+// console.log(results)
 results.forEach(x=> console.log(x))
-/*
-V = D/T
-D = VT
-T = D/V
-*/
