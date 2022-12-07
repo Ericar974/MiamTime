@@ -8,6 +8,12 @@ let listRestos = [
     {name: "restoD", x: 48.8608, y: 2.3570},
     {name: "restoE", x: 48.8628, y: 2.3550}
 ];
+let array = []
+listRestos.forEach(x=>{
+    document.querySelector('#listResto').appendChild(document.createElement("p")).innerText = x.name;
+})
+
+//document.querySelector('#listResto p').innerHTML = array[0] + array[1] + array[2]+ array[3]
 
 let persos = [
     {resto: listRestos[1], color: 'blue', name: 'A', x: 48.8588, y: 2.3570},

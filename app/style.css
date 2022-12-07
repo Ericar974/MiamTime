@@ -4,6 +4,9 @@
     box-sizing: border-box;
 }
 
+#listResto p{
+    color: blue;
+}
 #map{
     height: 100%;
     width: 60%;
