@@ -102,10 +102,6 @@ estimation.forEach(x=> {
     var alerteText = document.createTextNode("Pour arriver a " + hRencontre + "h" +mRencontre + " " + x[0] + " doit partir a " + heureEstimation);
     newAlerte.appendChild(alerteText)
     alerte.appendChild(newAlerte)
-
-/*
-    console.log("Pour arrivé à " + hRencontre + "h" +mRencontre + " il faudra que " + x[0] + " parte à " + heureEstimation)
-*/
 })
 
 
@@ -129,18 +125,14 @@ function displayPersoWalk(personnages, restaurants) {
             shadowSize: [0,0]
         });
         layerGroup.addLayer(newMarker);
+        newMarker.bindPopup("<b>Salut !</b><br>Je suis " + personnages[i].name);
 
         newMarker.on('dragend', function(event){
-            /*console.log(layerGroup)*/
             map.removeLayer(layerGroup)
             let marker = event.target;
             let position = marker.getLatLng();
             personnages[i].x = position.lat;
             personnages[i].y = position.lng;
-/*            console.log("marker")
-            console.log(marker)
-            console.log("perso")
-            console.log(personnages[i])*/
             displayPersoWalk(personnages, restaurants)
         });
 
@@ -148,11 +140,9 @@ function displayPersoWalk(personnages, restaurants) {
             color: personnages[i].color,
             fillColor: personnages[i].color,
             fillOpacity: 0.6,
-            radius: 35,
+            radius: 20,
         });
-        p.bindPopup("<b>Salut !</b><br>Je suis " + personnages[i].name);
         layerGroup.addLayer(p);
-
 
         let persoToRestaurant = L.polygon([
             [personnages[i].x, personnages[i].y],
@@ -161,7 +151,6 @@ function displayPersoWalk(personnages, restaurants) {
             color: 'black'
         });
         layerGroup.addLayer(persoToRestaurant);
-
 
         let restaurantToMeet = L.polygon([
             [personnages[i].resto.x, personnages[i].resto.y],
@@ -192,7 +181,7 @@ function displayPersoWalk(personnages, restaurants) {
     }).addTo(map);
     lieu.bindPopup("Rendez-vous ici");
 
-    layerGroup.addLayer(newMarker, p, persoToRestaurant, restaurantToMeet, r, lieu);
+    layerGroup.addLayer(newMarker, p, persoToRestaurant);
 }
 
 displayPersoWalk(persos, listRestos)
