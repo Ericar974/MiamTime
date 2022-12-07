@@ -97,7 +97,15 @@ let heureEstimation
 estimation.forEach(x=> {
     heureEstimation = heureRencontre - x[1]
     heureEstimation = Math.trunc(heureEstimation/60) + "h" + Math.trunc(heureEstimation%60)
+    let alerte = document.getElementById("alerte")
+    let newAlerte = document.createElement('p')
+    var alerteText = document.createTextNode("Pour arriver a " + hRencontre + "h" +mRencontre + " " + x[0] + " doit partir a " + heureEstimation);
+    newAlerte.appendChild(alerteText)
+    alerte.appendChild(newAlerte)
+
+/*
     console.log("Pour arrivé à " + hRencontre + "h" +mRencontre + " il faudra que " + x[0] + " parte à " + heureEstimation)
+*/
 })
 
 
@@ -132,7 +140,7 @@ function displayPersoWalk(personnages, restaurants) {
             [restaurants[i].x + 0.00015, restaurants[i].y + 0.00015],
             [restaurants[i].x - 0.00015, restaurants[i].y - 0.00015]], {
             color: "#E643C8",
-            fillOpacity: 0.6,
+            fillOpacity: 0.8,
             weight: 3
         }).addTo(map);
         r.bindPopup(restaurants[i].name);
