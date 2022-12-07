@@ -16,7 +16,7 @@ let persos = [
 ];
 
 //Lieu de rencontre
-let lieuRencontre = {x: 30, y: 29}
+let lieuRencontre = {x: 48.8605, y: 2.3525}
 let hRencontre = 13
 let mRencontre = 30
 //on travail en minute donc transformation de l'heure
@@ -133,6 +133,14 @@ function displayPersoWalk(personnages, restaurants) {
         ], {
             color: 'black'
         }).addTo(map);
+
+        let restaurantToMeet = L.polygon([
+            [personnages[i].resto.x, personnages[i].resto.y],
+            [lieuRencontre.x, lieuRencontre.y]
+        ], {
+            color: '#3AF2E4',
+            opacity: 1
+        }).addTo(map);
     }
 
     for (let i = 0; i<restaurants.length; i++){
@@ -145,6 +153,15 @@ function displayPersoWalk(personnages, restaurants) {
         }).addTo(map);
         r.bindPopup(restaurants[i].name);
     }
+
+    let lieu = L.rectangle([
+        [lieuRencontre.x + 0.00020, lieuRencontre.y + 0.00030],
+        [lieuRencontre.x - 0.00020, lieuRencontre.y - 0.00030]], {
+        color: "red",
+        fillOpacity: 1,
+        weight: 3
+    }).addTo(map);
+    lieu.bindPopup("Rendez-vous ici");
 }
 
 displayPersoWalk(persos, listRestos)
