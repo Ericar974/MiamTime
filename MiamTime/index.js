@@ -1,19 +1,18 @@
 //vitesse des personnages
 let vitesse = 5 / 60
 
-//Liste des restos
-let listRestos = {
-    resto1: {x: 20, y: 20},
-    resto2: {x: 6, y: 29},
-    resto3: {x: 14, y: 2},
-    resto4: {x: 30, y: 10},
-    resto5: {x: 1, y: 3}
-}
-// Liste des perso
+let listRestos = [
+    {name: "restoA", x: 48.8588, y: 2.3490},
+    {name: "restoB", x: 48.8558, y: 2.3470},
+    {name: "restoC", x: 48.8568, y: 2.3390},
+    {name: "restoD", x: 48.8608, y: 2.3570},
+    {name: "restoE", x: 48.8628, y: 2.3550}
+];
+
 let persos = [
-    {resto: listRestos.resto2, color: 'blue', name: 'A', x: 20, y: 13},
-    {resto: listRestos.resto3, color: 'green', name: 'B',x: 2, y: 9},
-    {resto: listRestos.resto5, color: 'yellow', name: 'C',x: 4, y: 32},
+    {resto: listRestos[1], color: 'blue', name: 'A', x: 48.8588, y: 2.3570},
+    {resto: listRestos[2], color: 'green', name: 'B', x: 48.8638, y: 2.3500},
+    {resto: listRestos[4], color: 'yellow', name: 'C', x: 48.8618, y: 2.3410},
 ];
 
 //Lieu de rencontre
@@ -39,9 +38,9 @@ function position(A, B) {
     distanceAB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2))
     vecteur = {x: B.x - A.x, y: B.y - A.y}
     if(temps === 1){
-        temps = distanceAB / vitesse
+        temps = distanceAB / vitesse *100
         estimation.push([A.name, temps ])
-        console.log(temps)
+        /*console.log(distanceAB * 100)*/
     } else{
         temps = distanceAB / vitesse
     }
@@ -100,3 +99,44 @@ estimation.forEach(x=> {
     heureEstimation = Math.trunc(heureEstimation/60) + "h" + Math.trunc(heureEstimation%60)
     console.log("Pour arrivé à " + hRencontre + "h" +mRencontre + " il faudra que " + x[0] + " parte à " + heureEstimation)
 })
+
+
+// ------------------- Travail map front -----------------------
+
+let map = L.map('map').setView([48.8588, 2.3470], 15);
+L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+}).addTo(map);
+
+function displayPersoWalk(personnages, restaurants) {
+    for (let i = 0; i<personnages.length; i++){
+        let p = L.circle([personnages[i].x, personnages[i].y], {
+            color: personnages[i].color,
+            fillColor: personnages[i].color,
+            fillOpacity: 0.6,
+            radius: 35
+        }).addTo(map);
+        p.bindPopup("<b>Salut !</b><br>Je suis " + personnages[i].name);
+
+        let persoToRestaurant = L.polygon([
+            [personnages[i].x, personnages[i].y],
+            [personnages[i].resto.x, personnages[i].resto.y]
+        ], {
+            color: 'black'
+        }).addTo(map);
+    }
+
+    for (let i = 0; i<restaurants.length; i++){
+        let r = L.rectangle([
+            [restaurants[i].x + 0.00015, restaurants[i].y + 0.00015],
+            [restaurants[i].x - 0.00015, restaurants[i].y - 0.00015]], {
+            color: "#E643C8",
+            fillOpacity: 0.6,
+            weight: 3
+        }).addTo(map);
+        r.bindPopup(restaurants[i].name);
+    }
+}
+
+displayPersoWalk(persos, listRestos)
