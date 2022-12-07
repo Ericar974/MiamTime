@@ -117,22 +117,51 @@ L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
+
 function displayPersoWalk(personnages, restaurants) {
+    let layerGroup = L.layerGroup().addTo(map)
+
     for (let i = 0; i<personnages.length; i++){
+
+        let newMarker = new L.marker([personnages[i].x,personnages[i].y],{
+            draggable: true,
+            autoPan: true,
+            shadowSize: [0,0]
+        });
+        layerGroup.addLayer(newMarker);
+
+        newMarker.on('dragend', function(event){
+            /*console.log(layerGroup)*/
+            map.removeLayer(layerGroup)
+            let marker = event.target;
+            let position = marker.getLatLng();
+            personnages[i].x = position.lat;
+            personnages[i].y = position.lng;
+/*            console.log("marker")
+            console.log(marker)
+            console.log("perso")
+            console.log(personnages[i])*/
+            displayPersoWalk(personnages, restaurants)
+        });
+
         let p = L.circle([personnages[i].x, personnages[i].y], {
             color: personnages[i].color,
             fillColor: personnages[i].color,
             fillOpacity: 0.6,
-            radius: 35
-        }).addTo(map);
+            radius: 35,
+        });
         p.bindPopup("<b>Salut !</b><br>Je suis " + personnages[i].name);
+        layerGroup.addLayer(p);
+
 
         let persoToRestaurant = L.polygon([
             [personnages[i].x, personnages[i].y],
             [personnages[i].resto.x, personnages[i].resto.y]
         ], {
             color: 'black'
-        }).addTo(map);
+        });
+        layerGroup.addLayer(persoToRestaurant);
+
 
         let restaurantToMeet = L.polygon([
             [personnages[i].resto.x, personnages[i].resto.y],
@@ -162,6 +191,8 @@ function displayPersoWalk(personnages, restaurants) {
         weight: 3
     }).addTo(map);
     lieu.bindPopup("Rendez-vous ici");
+
+    layerGroup.addLayer(newMarker, p, persoToRestaurant, restaurantToMeet, r, lieu);
 }
 
 displayPersoWalk(persos, listRestos)
