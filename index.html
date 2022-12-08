@@ -378,14 +378,23 @@
             r.bindPopup(restaurants[i].name);
         }
 
-        lieu = L.rectangle([
+        /*lieu = L.rectangle([
             [lieuRencontre.x + 0.00020, lieuRencontre.y + 0.00030],
             [lieuRencontre.x - 0.00020, lieuRencontre.y - 0.00030]], {
             color: "red",
             fillOpacity: 1,
             weight: 3
         }).addTo(map);
-        lieu.bindPopup("Rendez-vous ici");
+        lieu.bindPopup("Rendez-vous ici");*/
+
+        layerGroup.addLayer(newMarker, p, persoToRestaurant, restaurantToMeet, r, lieu);
+        newMarker = new L.marker(lieuRencontre.x,lieuRencontre.y),{
+            draggable: true,
+            autoPan: true,
+            shadowSize: [0,0]
+        });
+        layerGroup.addLayer(newMarker);
+        newMarker.bindPopup("<b>Salut !</b><br>Moi c'est " + personnages[i].name);
 
         layerGroup.addLayer(newMarker, p, persoToRestaurant, restaurantToMeet, r, lieu);
     }
