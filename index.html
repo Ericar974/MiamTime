@@ -334,6 +334,7 @@
     let restaurantToMeet
     let r
     let lieu
+    let newMarker2
 
     function displayPersoWalk(personnages, restaurants) {
         let layerGroup = L.layerGroup().addTo(map)
@@ -381,6 +382,7 @@
                 color: '#3AF2E4',
                 opacity: 1
             }).addTo(map);
+            layerGroup.addLayer(restaurantToMeet);
         }
 
         for (let i = 0; i<restaurants.length; i++){
@@ -393,26 +395,28 @@
             }).addTo(map);
             r.bindPopup(restaurants[i].name);
         }
+        const myIcon = L.icon({
+            iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Carr%C3%A9_rouge.svg/1024px-Carr%C3%A9_rouge.svg.png',
+            iconSize: [28, 28],
+        });
+        console.log(myIcon)
 
-        /*lieu = L.rectangle([
-            [lieuRencontre.x + 0.00020, lieuRencontre.y + 0.00030],
-            [lieuRencontre.x - 0.00020, lieuRencontre.y - 0.00030]], {
-            color: "red",
-            fillOpacity: 1,
-            weight: 3
-        }).addTo(map);
-        lieu.bindPopup("Rendez-vous ici");*/
-
-        layerGroup.addLayer(newMarker, p, persoToRestaurant, restaurantToMeet, r, lieu);
-        newMarker = new L.marker(lieuRencontre.x,lieuRencontre.y),{
+        let newMarker2 = new L.marker([lieuRencontre.x,lieuRencontre.y],{
+            icon: myIcon,
             draggable: true,
             autoPan: true,
-            shadowSize: [0,0]
         });
-        layerGroup.addLayer(newMarker);
-        newMarker.bindPopup("<b>Salut !</b><br>Moi c'est " + personnages[i].name);
+        layerGroup.addLayer(newMarker2);
 
-        layerGroup.addLayer(newMarker, p, persoToRestaurant, restaurantToMeet, r, lieu);
+        newMarker2.on('dragend', function(event){
+            map.removeLayer(layerGroup)
+            let marker = event.target;
+            let position = marker.getLatLng();
+            lieuRencontre.x = position.lat;
+            lieuRencontre.y = position.lng;
+            displayPersoWalk(personnages, restaurants)
+            estimate()
+        });
     }
 
     displayPersoWalk(persos, listRestos)
