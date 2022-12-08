@@ -86,11 +86,32 @@
         #alerte{
             position: absolute;
             top: 0;
-            left: 50%;
+            left: 30%;
             transform: translate(-50%, 0);
             z-index: 999;
             background: rgba(225, 225, 225, 0.7);
             padding: 20px 40px;
+        }
+
+        #listResto p{
+            margin: 10px;
+            padding: 5px;
+            background-color: gray;
+            cursor: pointer;
+        }
+
+        #modal{
+            position: absolute;
+            top: 10%;
+            left: 60%;
+            z-index: 999;
+            background-color: black;
+            border-radius: 90px;
+            opacity: 0;
+        }
+        #modal p{
+            color: white;
+            padding: 10px;
         }
     </style>
 </head>
@@ -110,6 +131,7 @@
         </form>
     </div>
     <div id="alerte"></div>
+    <div id="modal"> <p>Les temps de trajets ont étés mis à jours</p></div>
 </div>
 
 
@@ -130,21 +152,28 @@
     });
 
     socket.on('chat message', function (msg) {
-        console.log(item)
+
         var item = document.createElement('li');
-        item.textContent = msg;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        console.log(msg)
+        //react
+        if(msg === 'go'){
+            //refresh the page
+            estimate()
+        }else{
+            item.textContent = msg;
+            messages.appendChild(item);
+            window.scrollTo(0, document.body.scrollHeight);
+        }
     });
     //vitesse des personnages
     let vitesse = 5 / 60
 
     let listRestos = [
-        {name: "restoA", x: 48.8588, y: 2.3490},
-        {name: "restoB", x: 48.8558, y: 2.3470},
-        {name: "restoC", x: 48.8568, y: 2.3390},
-        {name: "restoD", x: 48.8608, y: 2.3570},
-        {name: "restoE", x: 48.8628, y: 2.3550}
+        {name: "McDO", x: 48.8588, y: 2.3490},
+        {name: "KFC", x: 48.8558, y: 2.3470},
+        {name: "Chinois", x: 48.8568, y: 2.3390},
+        {name: "BK", x: 48.8608, y: 2.3570},
+        {name: "5 Guys", x: 48.8628, y: 2.3550}
     ];
     let array = []
     listRestos.forEach(x=>{
@@ -154,9 +183,10 @@
     //document.querySelector('#listResto p').innerHTML = array[0] + array[1] + array[2]+ array[3]
 
     let persos = [
-        {resto: listRestos[1], color: 'blue', name: 'A', x: 48.8588, y: 2.3570},
-        {resto: listRestos[2], color: 'green', name: 'B', x: 48.8638, y: 2.3500},
-        {resto: listRestos[4], color: 'yellow', name: 'C', x: 48.8618, y: 2.3410},
+        {resto: listRestos[1], color: 'blue', name: 'Armand', x: 48.8588, y: 2.3570},
+        {resto: listRestos[2], color: 'green', name: 'Canberra', x: 48.8638, y: 2.3500},
+        {resto: listRestos[4], color: 'yellow', name: 'Mathieu', x: 48.8618, y: 2.3410},
+        {resto: listRestos[3], color: 'brown', name: 'Lucas', x: 48.8605, y: 2.3410},
     ];
 
     //Lieu de rencontre
@@ -190,7 +220,7 @@
         }
     }
 
-
+/*
     //TRAVAIL SUR LE DEPLACEMENT EN TEMPS REEL
     let i = 1
     let boucle = 1
@@ -228,25 +258,50 @@
         results.push(A.name + ' est arrivé au lieu de rendez vous en ' + Math.trunc(i/60) + 'heure et ' + i%60  + 'min')
     }
 
+ */
+
 
     // RENDU DE LA PAGE
-    //Action pour lancer les fonctions
-    for(let perso = 0; perso < persos.length; perso++){
-        position(persos[perso], persos[perso].resto)
+
+    function positione(){
+        for(let perso = 0; perso < persos.length; perso++){
+            position(persos[perso], persos[perso].resto)
+        }
     }
+    //Action pour lancer les fonctions
+
 
     //results.forEach(x=> console.log(x))
     //console.log du rendu de l'estimation
     let heureEstimation
-    estimation.forEach(x=> {
-        heureEstimation = heureRencontre - x[1]
-        heureEstimation = Math.trunc(heureEstimation/60) + "h" + Math.trunc(heureEstimation%60)
-        let alerte = document.getElementById("alerte")
-        let newAlerte = document.createElement('p')
-        var alerteText = document.createTextNode("Pour arriver a " + hRencontre + "h" +mRencontre + " " + x[0] + " doit partir a " + heureEstimation);
-        newAlerte.appendChild(alerteText)
-        alerte.appendChild(newAlerte)
-    })
+    let firsttry
+    function estimate(){
+
+        estimation.length === 0 ? firsttry = true: firsttry = false
+        estimation = []
+        positione()
+
+        document.querySelectorAll("#alerte h2").forEach(x=>x.remove())
+        document.querySelectorAll("#alerte p").forEach(x=>x.remove())
+        console.log((mRencontre < 10 ? '0' +mRencontre : mRencontre))
+        document.querySelector('#alerte').appendChild(document.createElement("h2")).innerText = hRencontre + 'h' + (mRencontre < 10 ? '0' +mRencontre : mRencontre);
+        estimation.forEach(x=> {
+            heureEstimation = heureRencontre - x[1]
+            heureEstimation = Math.trunc(heureEstimation/60) + "h" + (Math.trunc(heureEstimation%60) < 10 ? "0" +Math.trunc(heureEstimation%60) : Math.trunc(heureEstimation%60))
+            let alerte = document.getElementById("alerte")
+            let newAlerte = document.createElement('p')
+            var alerteText = document.createTextNode(x[0] + " doit partir a " + heureEstimation);
+            newAlerte.appendChild(alerteText)
+            alerte.appendChild(newAlerte)
+        })
+        firsttry ? document.querySelector('#modal').style.opacity = 0 : document.querySelector('#modal').style.opacity = 1
+        setTimeout(function () {
+            document.querySelector('#modal').style.opacity = 0;
+        }, 2000);
+        firsttry = false
+    }
+    estimate()
+
 
 
     // ------------------- Travail map front -----------------------
@@ -257,19 +312,25 @@
         attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(map);
 
+    let newMarker
+    let p
+    let persoToRestaurant
+    let restaurantToMeet
+    let r
+    let lieu
 
     function displayPersoWalk(personnages, restaurants) {
         let layerGroup = L.layerGroup().addTo(map)
 
         for (let i = 0; i<personnages.length; i++){
 
-            let newMarker = new L.marker([personnages[i].x,personnages[i].y],{
+            newMarker = new L.marker([personnages[i].x,personnages[i].y],{
                 draggable: true,
                 autoPan: true,
                 shadowSize: [0,0]
             });
             layerGroup.addLayer(newMarker);
-            newMarker.bindPopup("<b>Salut !</b><br>Je suis " + personnages[i].name);
+            newMarker.bindPopup("<b>Salut !</b><br>Moi c'est " + personnages[i].name);
 
             newMarker.on('dragend', function(event){
                 map.removeLayer(layerGroup)
@@ -278,9 +339,10 @@
                 personnages[i].x = position.lat;
                 personnages[i].y = position.lng;
                 displayPersoWalk(personnages, restaurants)
+                estimate()
             });
 
-            let p = L.circle([personnages[i].x, personnages[i].y], {
+            p = L.circle([personnages[i].x, personnages[i].y], {
                 color: personnages[i].color,
                 fillColor: personnages[i].color,
                 fillOpacity: 0.6,
@@ -288,7 +350,7 @@
             });
             layerGroup.addLayer(p);
 
-            let persoToRestaurant = L.polygon([
+            persoToRestaurant = L.polygon([
                 [personnages[i].x, personnages[i].y],
                 [personnages[i].resto.x, personnages[i].resto.y]
             ], {
@@ -296,7 +358,7 @@
             });
             layerGroup.addLayer(persoToRestaurant);
 
-            let restaurantToMeet = L.polygon([
+            restaurantToMeet = L.polygon([
                 [personnages[i].resto.x, personnages[i].resto.y],
                 [lieuRencontre.x, lieuRencontre.y]
             ], {
@@ -306,7 +368,7 @@
         }
 
         for (let i = 0; i<restaurants.length; i++){
-            let r = L.rectangle([
+            r = L.rectangle([
                 [restaurants[i].x + 0.00015, restaurants[i].y + 0.00015],
                 [restaurants[i].x - 0.00015, restaurants[i].y - 0.00015]], {
                 color: "#E643C8",
@@ -316,7 +378,7 @@
             r.bindPopup(restaurants[i].name);
         }
 
-        let lieu = L.rectangle([
+        lieu = L.rectangle([
             [lieuRencontre.x + 0.00020, lieuRencontre.y + 0.00030],
             [lieuRencontre.x - 0.00020, lieuRencontre.y - 0.00030]], {
             color: "red",
@@ -325,7 +387,7 @@
         }).addTo(map);
         lieu.bindPopup("Rendez-vous ici");
 
-        layerGroup.addLayer(newMarker, p, persoToRestaurant);
+        layerGroup.addLayer(newMarker, p, persoToRestaurant, restaurantToMeet, r, lieu);
     }
 
     displayPersoWalk(persos, listRestos)
