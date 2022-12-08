@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=windows-1252">
-    <meta charset="utf-8" />
+    <meta charset="utf-8"/>
     <title>MiamTime</title>
     <meta http-equiv="content-style-type" content="text/css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
@@ -12,22 +12,24 @@
             integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
             crossorigin=""></script>
     <style>
-        #listResto p{
+        #listResto p {
             color: blue;
         }
-        #map{
+
+        #map {
             height: 100%;
             width: 100%;
             grid-column: 2/6;
         }
 
-        .container{
+        .container {
             position: relative;
             height: 100%;
             display: grid;
             grid-template-columns: repeat(6, 1fr);
             text-align: center;
         }
+
         body {
             height: 100vh;
             margin: 0;
@@ -83,7 +85,8 @@
         #messages > li:nth-child(odd) {
             background: #efefef;
         }
-        #alerte{
+
+        #alerte {
             position: absolute;
             top: 0;
             left: 30%;
@@ -93,14 +96,14 @@
             padding: 20px 40px;
         }
 
-        #listResto p{
+        #listResto p, #room p {
             margin: 10px;
             padding: 5px;
             background-color: gray;
             cursor: pointer;
         }
 
-        #modal{
+        #modal {
             position: absolute;
             top: 5%;
             left: 75%;
@@ -110,9 +113,14 @@
             width: 100px;
             height: 100px;
         }
-        #modal p{
+
+        #modal p {
             color: white;
             padding: 10px;
+        }
+
+        #room p {
+
         }
     </style>
 </head>
@@ -161,15 +169,15 @@
         let item = document.createElement('li');
         console.log(msg)
         //react
-        if(msg.match(/\/changeHour \d{1,2}h\d\d/)){
+        if (msg.match(/\/changeHour \d{1,2}h\d\d/)) {
             hRencontre = parseInt(msg.match(/\/changeHour (\d{1,2})h\d\d/)[1])
             mRencontre = parseInt(msg.match(/\/changeHour \d{1,2}h(\d\d)/)[1])
             //refresh the page
             estimate()
-        }else{
+        } else {
             item.textContent = msg;
             messages.appendChild(item);
-           window.scrollTo(0, document.body.scrollHeight);
+            window.scrollTo(0, document.body.scrollHeight);
         }
     });
     //vitesse des personnages
@@ -194,20 +202,82 @@
         {resto: listRestos[3], color: 'brown', name: 'Lucas', x: 48.8605, y: 2.3410},
     ];
 
-    listRestos.forEach(x=>{
+    listRestos.forEach(x => {
         document.querySelector('#listResto').appendChild(document.createElement("p")).innerText = x.name;
     })
-    persos.forEach(x=>{
+    persos.forEach(x => {
         document.querySelector('#room').appendChild(document.createElement("p")).innerText = x.name;
     })
+
+    //afficher le perso et son resto
+    let persoChosen
+    function clickP(p){
+        persos.forEach(x=>{
+            if(x.name === p.innerText){
+                persoChosen = x
+                document.querySelectorAll('#room p').forEach(x=>x.style.background = 'gray')
+                p.style.background = 'red'
+            }
+        })
+
+        listRestos.forEach(x=>{
+            if(x.name === persoChosen.resto.name){
+                document.querySelectorAll('#listResto p').forEach(x=>x.style.background = 'gray')
+                document.querySelectorAll('#listResto p').forEach(x=>{
+                    console.log(x)
+                    if(x.innerText === persoChosen.resto.name){
+                        x.style.background = 'red'
+                    }
+                })
+            }
+        })
+    }
+
+    //change le resto du personnage
+    let okChangeResto = false
+    let persoToChange
+    let restoToChange
+    function changeResto(r){
+        console.log(r)
+        document.querySelectorAll('#room p').forEach(x=>{
+            if(x.style.background === 'red'){
+                okChangeResto = true
+                persoToChange = x.innerText
+            }
+        })
+        persos.forEach(x=>{
+            if(x.name === persoToChange){
+                persoToChange = x
+            }
+        })
+        console.log(okChangeResto)
+        if(okChangeResto){
+            listRestos.forEach(x=>{
+                if(x.name === r.innerText){
+                    restoToChange = x
+                }
+            })
+            console.log(persoToChange)
+            persoToChange.resto = restoToChange
+            document.querySelectorAll('#listResto p').forEach(x=>x.style.background = 'gray')
+            r.style.background = 'red'
+            displayPersoWalk(persoToChange, restoToChange)
+            estimate()
+        }
+
+    }
+
+    document.querySelectorAll('#room p').forEach(x=>x.setAttribute("onclick", "clickP(this)"))
+    document.querySelectorAll('#listResto p').forEach(x=>x.setAttribute("onclick", "changeResto(this)"))
     //Lieu de rencontre
     let lieuRencontre = {x: 48.8605, y: 2.3525}
     let hRencontre = 13
     let mRencontre = 30
     //on travail en minute donc transformation de l'heure
     let heureRencontre
-    function newHour(){
-        heureRencontre = hRencontre*60 + mRencontre
+
+    function newHour() {
+        heureRencontre = hRencontre * 60 + mRencontre
     }
 
 
@@ -223,6 +293,7 @@
     let vecteur
     let temps = 1
     let tempsTotal = 1
+
     //fonction principal pour l'estimation du temps
     function position(A, B) {
         tempsTotal = 1
@@ -230,64 +301,65 @@
         distanceAB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2))
         distanceBC = Math.sqrt(Math.pow(lieuRencontre.x - B.x, 2) + Math.pow(lieuRencontre.y - B.y, 2))
         vecteur = {x: B.x - A.x, y: B.y - A.y}
-        if(temps === 1){
-            temps = distanceAB / vitesse *100
-            tempsTotal = temps + distanceBC / vitesse *100
-            estimation.push([A.name, temps,  tempsTotal])
+        if (temps === 1) {
+            temps = distanceAB / vitesse * 100
+            tempsTotal = temps + distanceBC / vitesse * 100
+            estimation.push([A.name, temps, tempsTotal])
             /*console.log(distanceAB * 100)*/
-        } else{
+        } else {
             temps = distanceAB / vitesse
         }
     }
 
-/*
-    //TRAVAIL SUR LE DEPLACEMENT EN TEMPS REEL
-    let i = 1
-    let boucle = 1
+    /*
+        //TRAVAIL SUR LE DEPLACEMENT EN TEMPS REEL
+        let i = 1
+        let boucle = 1
 
-    // A personne; B lieu
-    function action(A, resto) {
-        console.log(A)
-        temps = 1
-        let B = {x: resto.x, y: resto.y}
-        i = 1
-        boucle = 1 // départ
-        while (temps >= vitesse && boucle < 3) {
-            position(A, B)
-            //console.log(temps)
-            //console.log(i + " min");
-            A.x = A.x + (vecteur.x / temps * 1)
-            A.y = A.y + (vecteur.y / temps * 1)
-            //console.log(A)
-            i++
-            if (Math.round(A.x * 10) / 10 === B.x && Math.round(A.y * 10) / 10 === B.y) {
-                boucle++ // arrivé au resto puis 3 et on stop
-                if (boucle === 2) {
-                    //arrivé au resto et calcul du nouveau itinéraire vers le lieu de rencontre
-                    A.x = B.x
-                    A.y = B.y
-                    B.x = lieuRencontre.x
-                    B.y = lieuRencontre.y
-                    //console.log(A.name + ' est arrivé au resto')
-                    results.push(A.name + ' est arrivé au resto en ' + i + 'min')
+        // A personne; B lieu
+        function action(A, resto) {
+            console.log(A)
+            temps = 1
+            let B = {x: resto.x, y: resto.y}
+            i = 1
+            boucle = 1 // départ
+            while (temps >= vitesse && boucle < 3) {
+                position(A, B)
+                //console.log(temps)
+                //console.log(i + " min");
+                A.x = A.x + (vecteur.x / temps * 1)
+                A.y = A.y + (vecteur.y / temps * 1)
+                //console.log(A)
+                i++
+                if (Math.round(A.x * 10) / 10 === B.x && Math.round(A.y * 10) / 10 === B.y) {
+                    boucle++ // arrivé au resto puis 3 et on stop
+                    if (boucle === 2) {
+                        //arrivé au resto et calcul du nouveau itinéraire vers le lieu de rencontre
+                        A.x = B.x
+                        A.y = B.y
+                        B.x = lieuRencontre.x
+                        B.y = lieuRencontre.y
+                        //console.log(A.name + ' est arrivé au resto')
+                        results.push(A.name + ' est arrivé au resto en ' + i + 'min')
+                    }
+
                 }
-
             }
+            //console.log(A.name + ' est arrivé avec ses amis')
+            results.push(A.name + ' est arrivé au lieu de rendez vous en ' + Math.trunc(i/60) + 'heure et ' + i%60  + 'min')
         }
-        //console.log(A.name + ' est arrivé avec ses amis')
-        results.push(A.name + ' est arrivé au lieu de rendez vous en ' + Math.trunc(i/60) + 'heure et ' + i%60  + 'min')
-    }
 
- */
+     */
 
 
     // RENDU DE LA PAGE
 
-    function positione(){
-        for(let perso = 0; perso < persos.length; perso++){
+    function positione() {
+        for (let perso = 0; perso < persos.length; perso++) {
             position(persos[perso], persos[perso].resto)
         }
     }
+
     //Action pour lancer les fonctions
 
 
@@ -295,19 +367,20 @@
     //console.log du rendu de l'estimation
     let heureEstimation
     let firsttry
-    function estimate(){
+
+    function estimate() {
         newHour()
-        estimation.length === 0 ? firsttry = true: firsttry = false
+        estimation.length === 0 ? firsttry = true : firsttry = false
         estimation = []
         positione()
 
-        document.querySelectorAll("#alerte h2").forEach(x=>x.remove())
-        document.querySelectorAll("#alerte p").forEach(x=>x.remove())
-        console.log((mRencontre < 10 ? '0' +mRencontre : mRencontre))
-        document.querySelector('#alerte').appendChild(document.createElement("h2")).innerText ='RDV : ' + hRencontre + 'h' + (mRencontre < 10 ? '0' +mRencontre : mRencontre);
-        estimation.forEach(x=> {
+        document.querySelectorAll("#alerte h2").forEach(x => x.remove())
+        document.querySelectorAll("#alerte p").forEach(x => x.remove())
+        console.log((mRencontre < 10 ? '0' + mRencontre : mRencontre))
+        document.querySelector('#alerte').appendChild(document.createElement("h2")).innerText = 'RDV : ' + hRencontre + 'h' + (mRencontre < 10 ? '0' + mRencontre : mRencontre);
+        estimation.forEach(x => {
             heureEstimation = heureRencontre - x[2]
-            heureEstimation = Math.trunc(heureEstimation/60) + "h" + (Math.trunc(heureEstimation%60) < 10 ? "0" +Math.trunc(heureEstimation%60) : Math.trunc(heureEstimation%60))
+            heureEstimation = Math.trunc(heureEstimation / 60) + "h" + (Math.trunc(heureEstimation % 60) < 10 ? "0" + Math.trunc(heureEstimation % 60) : Math.trunc(heureEstimation % 60))
             document.getElementById("alerte").appendChild(document.createElement('p')).innerText = x[0] + " doit partir a " + heureEstimation;
         })
         firsttry ? document.querySelector('#modal').style.opacity = 0 : document.querySelector('#modal').style.opacity = 1
@@ -316,8 +389,8 @@
         }, 1000);
         firsttry = false
     }
-    estimate()
 
+    estimate()
 
 
     // ------------------- Travail map front -----------------------
@@ -339,17 +412,17 @@
     function displayPersoWalk(personnages, restaurants) {
         let layerGroup = L.layerGroup().addTo(map)
 
-        for (let i = 0; i<personnages.length; i++){
+        for (let i = 0; i < personnages.length; i++) {
 
-            newMarker = new L.marker([personnages[i].x,personnages[i].y],{
+            newMarker = new L.marker([personnages[i].x, personnages[i].y], {
                 draggable: true,
                 autoPan: true,
-                shadowSize: [0,0]
+                shadowSize: [0, 0]
             });
             layerGroup.addLayer(newMarker);
             newMarker.bindPopup("<b>Salut !</b><br>Moi c'est " + personnages[i].name);
 
-            newMarker.on('dragend', function(event){
+            newMarker.on('dragend', function (event) {
                 map.removeLayer(layerGroup)
                 let marker = event.target;
                 let position = marker.getLatLng();
@@ -385,7 +458,7 @@
             layerGroup.addLayer(restaurantToMeet);
         }
 
-        for (let i = 0; i<restaurants.length; i++){
+        for (let i = 0; i < restaurants.length; i++) {
             r = L.rectangle([
                 [restaurants[i].x + 0.00015, restaurants[i].y + 0.00015],
                 [restaurants[i].x - 0.00015, restaurants[i].y - 0.00015]], {
@@ -401,14 +474,14 @@
         });
         console.log(myIcon)
 
-        let newMarker2 = new L.marker([lieuRencontre.x,lieuRencontre.y],{
+        let newMarker2 = new L.marker([lieuRencontre.x, lieuRencontre.y], {
             icon: myIcon,
             draggable: true,
             autoPan: true,
         });
         layerGroup.addLayer(newMarker2);
 
-        newMarker2.on('dragend', function(event){
+        newMarker2.on('dragend', function (event) {
             map.removeLayer(layerGroup)
             let marker = event.target;
             let position = marker.getLatLng();
