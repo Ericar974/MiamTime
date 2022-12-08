@@ -12,11 +12,7 @@
             integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM="
             crossorigin=""></script>
     <style>
-        #listResto p {
-            color: blue;
-        }
-
-        #map {
+        #map{
             height: 100%;
             width: 100%;
             grid-column: 2/6;
@@ -98,9 +94,10 @@
 
         #listResto p, #room p {
             margin: 10px;
-            padding: 5px;
+            padding: 10px;
             background-color: gray;
             cursor: pointer;
+            color: white;
         }
 
         #modal {
@@ -118,9 +115,15 @@
             color: white;
             padding: 10px;
         }
-
-        #room p {
-
+        #room div{
+            justify-content: center;
+            align-items: center;
+        }
+        #room .circle{
+            border-radius: 100%;
+            width: 15px;
+            height: 15px;
+            margin-right: 5px;
         }
     </style>
 </head>
@@ -167,7 +170,7 @@
     socket.on('chat message', function (msg) {
 
         let item = document.createElement('li');
-        console.log(msg)
+        //console.log(msg)
         //react
         if (msg.match(/\/changeHour \d{1,2}h\d\d/)) {
             hRencontre = parseInt(msg.match(/\/changeHour (\d{1,2})h\d\d/)[1])
@@ -202,11 +205,25 @@
         {resto: listRestos[3], color: 'brown', name: 'Lucas', x: 48.8605, y: 2.3410},
     ];
 
-    listRestos.forEach(x => {
+    listRestos.forEach((x) => {
         document.querySelector('#listResto').appendChild(document.createElement("p")).innerText = x.name;
-    })
-    persos.forEach(x => {
-        document.querySelector('#room').appendChild(document.createElement("p")).innerText = x.name;
+    });
+    persos.forEach((x) => {
+        let divFlex = document.createElement("div")
+        divFlex.style.display = "flex"
+
+        let pastille = document.createElement("div");
+        pastille.className += "circle"
+        pastille.style.backgroundColor = x.color;
+
+        let name = document.createElement("p");
+        name.innerText = x.name
+
+        let room = document.querySelector('#room')
+
+        room.appendChild(divFlex)
+        divFlex.appendChild(pastille);
+        divFlex.appendChild(name)
     })
 
     //afficher le perso et son resto
@@ -228,7 +245,6 @@
             if(x.name === persoChosen.resto.name){
                 document.querySelectorAll('#listResto p').forEach(x=>x.style.background = 'gray')
                 document.querySelectorAll('#listResto p').forEach(x=>{
-                    console.log(x)
                     if(x.innerText === persoChosen.resto.name){
                         x.style.background = 'red'
                     }
@@ -253,7 +269,6 @@
                 persoToChange = x
             }
         })
-        console.log(okChangeResto)
         if(okChangeResto){
             listRestos.forEach(x=>{
                 if(x.name === r.innerText){
@@ -262,9 +277,11 @@
             })
             console.log(persoToChange)
             persoToChange.resto = restoToChange
+            console.log(restoToChange)
             document.querySelectorAll('#listResto p').forEach(x=>x.style.background = 'gray')
             r.style.background = 'red'
-            displayPersoWalk(persoToChange, restoToChange)
+            map.removeLayer(layerGroup)
+            displayPersoWalk(persos, listRestos)
             estimate()
         }
 
@@ -411,9 +428,10 @@
     let r
     let lieu
     let newMarker2
+    let layerGroup
 
     function displayPersoWalk(personnages, restaurants) {
-        let layerGroup = L.layerGroup().addTo(map)
+        layerGroup = L.layerGroup().addTo(map)
 
         for (let i = 0; i < personnages.length; i++) {
 
@@ -455,7 +473,7 @@
                 [personnages[i].resto.x, personnages[i].resto.y],
                 [lieuRencontre.x, lieuRencontre.y]
             ], {
-                color: '#3AF2E4',
+                color: 'red',
                 opacity: 1
             }).addTo(map);
             layerGroup.addLayer(restaurantToMeet);
@@ -475,7 +493,6 @@
             iconUrl: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Carr%C3%A9_rouge.svg/1024px-Carr%C3%A9_rouge.svg.png',
             iconSize: [28, 28],
         });
-        console.log(myIcon)
 
         let newMarker2 = new L.marker([lieuRencontre.x, lieuRencontre.y], {
             icon: myIcon,
