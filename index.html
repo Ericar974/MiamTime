@@ -215,8 +215,12 @@
         persos.forEach(x=>{
             if(x.name === p.innerText){
                 persoChosen = x
-                document.querySelectorAll('#room p').forEach(x=>x.style.background = 'gray')
-                p.style.background = 'red'
+                document.querySelectorAll('#room p').forEach(x=>{
+                    x.style.background = 'gray'
+                    x.classList.remove('selected')
+                })
+                p.className += 'selected'
+                p.style.background = x.color
             }
         })
 
@@ -238,9 +242,8 @@
     let persoToChange
     let restoToChange
     function changeResto(r){
-        console.log(r)
         document.querySelectorAll('#room p').forEach(x=>{
-            if(x.style.background === 'red'){
+            if(x.className === 'selected'){
                 okChangeResto = true
                 persoToChange = x.innerText
             }
