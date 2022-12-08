@@ -7,7 +7,23 @@ const path = require("path");
 const io = new Server(server);
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/app/index.html');
+});
+
+app.get('/style', (req, res) => {
+    res.sendFile(__dirname + '/app/css/style.css');
+});
+
+app.get('/js', (req, res) => {
+    res.sendFile(__dirname + '/app/javascript/index.js');
+});
+
+app.get('/socket', (req, res) => {
+    res.sendFile(__dirname + '/app/javascript/socket.js');
+});
+
+app.get('/map', (req, res) => {
+    res.sendFile(__dirname + '/app/javascript/map.js');
 });
 
 io.on('connection', (socket) => {
