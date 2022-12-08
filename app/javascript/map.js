@@ -16,6 +16,7 @@ let newMarker2
 let layerGroup
 
 function displayPersoWalk(personnages, restaurants) {
+    estimate()
     layerGroup = L.layerGroup().addTo(map)
 
     for (let i = 0; i < personnages.length; i++) {
@@ -26,7 +27,8 @@ function displayPersoWalk(personnages, restaurants) {
             shadowSize: [0, 0]
         });
         layerGroup.addLayer(newMarker);
-        newMarker.bindPopup("<b>Salut !</b><br>Moi c'est " + personnages[i].name);
+        console.log(personnages[i].heure)
+        newMarker.bindPopup("<b>Salut !</b><br>Moi c'est " + personnages[i].name + " et " + personnages[i].heure);
 
         newMarker.on('dragend', function (event) {
             map.removeLayer(layerGroup)

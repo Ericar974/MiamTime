@@ -22,6 +22,8 @@ socket.on('chat message', function (msg) {
         mRencontre = parseInt(msg.match(/\/changeHour \d{1,2}h(\d\d)/)[1])
         //refresh the page
         estimate()
+    } else if(msg.match(/^\//)){
+        alert("commande inconnu")
     } else {
         item.textContent = msg;
         messages.appendChild(item);

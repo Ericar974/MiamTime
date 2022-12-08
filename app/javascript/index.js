@@ -15,10 +15,10 @@ let array = []
 //document.querySelector('#listResto p').innerHTML = array[0] + array[1] + array[2]+ array[3]
 
 let persos = [
-    {resto: listRestos[1], color: 'blue', name: 'Armand', x: 48.8588, y: 2.3570},
-    {resto: listRestos[2], color: 'green', name: 'Canberra', x: 48.8638, y: 2.3500},
-    {resto: listRestos[4], color: 'yellow', name: 'Mathieu', x: 48.8618, y: 2.3410},
-    {resto: listRestos[3], color: 'brown', name: 'Lucas', x: 48.8605, y: 2.3410},
+    {resto: listRestos[1], heure: '', color: 'blue', name: 'Armand', x: 48.8588, y: 2.3570},
+    {resto: listRestos[2], heure: '', color: 'green', name: 'Canberra', x: 48.8638, y: 2.3500},
+    {resto: listRestos[4], heure: '', color: 'yellow', name: 'Mathieu', x: 48.8618, y: 2.3410},
+    {resto: listRestos[3], heure: '', color: 'brown', name: 'Lucas', x: 48.8605, y: 2.3410},
 ];
 
 listRestos.forEach((x) => {
@@ -98,7 +98,6 @@ function changeResto(r){
         r.style.background = 'red'
         map.removeLayer(layerGroup)
         displayPersoWalk(persos, listRestos)
-        estimate()
     }
 
 }
@@ -212,12 +211,16 @@ function estimate() {
 
     document.querySelectorAll("#alerte h2").forEach(x => x.remove())
     document.querySelectorAll("#alerte p").forEach(x => x.remove())
-    console.log((mRencontre < 10 ? '0' + mRencontre : mRencontre))
     document.querySelector('#alerte').appendChild(document.createElement("h2")).innerText = 'RDV : ' + hRencontre + 'h' + (mRencontre < 10 ? '0' + mRencontre : mRencontre);
     estimation.forEach(x => {
         heureEstimation = heureRencontre - x[2]
         heureEstimation = Math.trunc(heureEstimation / 60) + "h" + (Math.trunc(heureEstimation % 60) < 10 ? "0" + Math.trunc(heureEstimation % 60) : Math.trunc(heureEstimation % 60))
         document.getElementById("alerte").appendChild(document.createElement('p')).innerText = x[0] + " doit partir a " + heureEstimation;
+        persos.forEach(y=>{
+            if(y.name === x[0]){
+                y.heure = heureEstimation
+            }
+        })
     })
     firsttry ? document.querySelector('#modal').style.opacity = 0 : document.querySelector('#modal').style.opacity = 1
     setTimeout(function () {

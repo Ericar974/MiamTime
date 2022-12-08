@@ -53,7 +53,19 @@ body {
     outline: none;
     color: #fff;
 }
+#form > p {
+    align-self:  center;
+    background: #333;
+    border: none;
+    padding: 0.5rem 1rem;
+    margin: 0.25rem;
+    border-radius: 3px;
+    outline: none;
+    color: #fff;
+}
+#form > p:hover{
 
+}
 #messages {
     list-style-type: none;
     margin: 0;
