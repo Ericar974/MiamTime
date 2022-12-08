@@ -102,12 +102,13 @@
 
         #modal{
             position: absolute;
-            top: 10%;
-            left: 60%;
+            top: 5%;
+            left: 75%;
             z-index: 999;
-            background-color: black;
             border-radius: 90px;
             opacity: 0;
+            width: 100px;
+            height: 100px;
         }
         #modal p{
             color: white;
@@ -123,7 +124,11 @@
     </div>
     <div id="map"></div>
     <div id="socket">
-        <p>Room</p>
+        <h2>Room</h2>
+        <div id="room">
+
+        </div>
+        <h3>Chat</h3>
         <ul id="messages"></ul>
         <form id="form" action="">
             <input id="input" autocomplete="off"/>
@@ -131,17 +136,17 @@
         </form>
     </div>
     <div id="alerte"></div>
-    <div id="modal"> <p>Les temps de trajets ont étés mis à jours</p></div>
+    <img id="modal" src="https://www.icone-png.com/png/16/16143.png" alt="">
 </div>
 
 
 <script src="/socket.io/socket.io.js"></script>
 <script>
-    var socket = io();
+    let socket = io();
 
-    var messages = document.getElementById('messages');
-    var form = document.getElementById('form');
-    var input = document.getElementById('input');
+    let messages = document.getElementById('messages');
+    let form = document.getElementById('form');
+    let input = document.getElementById('input');
 
     form.addEventListener('submit', function (e) {
         e.preventDefault();
@@ -153,16 +158,18 @@
 
     socket.on('chat message', function (msg) {
 
-        var item = document.createElement('li');
+        let item = document.createElement('li');
         console.log(msg)
         //react
-        if(msg === 'go'){
+        if(msg.match(/\/changeHour \d{1,2}h\d\d/)){
+            hRencontre = parseInt(msg.match(/\/changeHour (\d{1,2})h\d\d/)[1])
+            mRencontre = parseInt(msg.match(/\/changeHour \d{1,2}h(\d\d)/)[1])
             //refresh the page
             estimate()
         }else{
             item.textContent = msg;
             messages.appendChild(item);
-            window.scrollTo(0, document.body.scrollHeight);
+           window.scrollTo(0, document.body.scrollHeight);
         }
     });
     //vitesse des personnages
@@ -176,9 +183,7 @@
         {name: "5 Guys", x: 48.8628, y: 2.3550}
     ];
     let array = []
-    listRestos.forEach(x=>{
-        document.querySelector('#listResto').appendChild(document.createElement("p")).innerText = x.name;
-    })
+
 
     //document.querySelector('#listResto p').innerHTML = array[0] + array[1] + array[2]+ array[3]
 
@@ -189,12 +194,22 @@
         {resto: listRestos[3], color: 'brown', name: 'Lucas', x: 48.8605, y: 2.3410},
     ];
 
+    listRestos.forEach(x=>{
+        document.querySelector('#listResto').appendChild(document.createElement("p")).innerText = x.name;
+    })
+    persos.forEach(x=>{
+        document.querySelector('#room').appendChild(document.createElement("p")).innerText = x.name;
+    })
     //Lieu de rencontre
     let lieuRencontre = {x: 48.8605, y: 2.3525}
     let hRencontre = 13
     let mRencontre = 30
     //on travail en minute donc transformation de l'heure
-    let heureRencontre = hRencontre*60 + mRencontre
+    let heureRencontre
+    function newHour(){
+        heureRencontre = hRencontre*60 + mRencontre
+    }
+
 
     //TABLEAUX contenant les informations finaux
     //tableau pour le déplacement en temps réel minute par minute
@@ -204,16 +219,21 @@
 
     //Init des var
     let distanceAB
+    let distanceBC
     let vecteur
     let temps = 1
+    let tempsTotal = 1
     //fonction principal pour l'estimation du temps
     function position(A, B) {
+        tempsTotal = 1
         temps = 1 //commenter la ligne si action est call
         distanceAB = Math.sqrt(Math.pow(B.x - A.x, 2) + Math.pow(B.y - A.y, 2))
+        distanceBC = Math.sqrt(Math.pow(lieuRencontre.x - B.x, 2) + Math.pow(lieuRencontre.y - B.y, 2))
         vecteur = {x: B.x - A.x, y: B.y - A.y}
         if(temps === 1){
             temps = distanceAB / vitesse *100
-            estimation.push([A.name, temps ])
+            tempsTotal = temps + distanceBC / vitesse *100
+            estimation.push([A.name, temps,  tempsTotal])
             /*console.log(distanceAB * 100)*/
         } else{
             temps = distanceAB / vitesse
@@ -276,7 +296,7 @@
     let heureEstimation
     let firsttry
     function estimate(){
-
+        newHour()
         estimation.length === 0 ? firsttry = true: firsttry = false
         estimation = []
         positione()
@@ -284,20 +304,16 @@
         document.querySelectorAll("#alerte h2").forEach(x=>x.remove())
         document.querySelectorAll("#alerte p").forEach(x=>x.remove())
         console.log((mRencontre < 10 ? '0' +mRencontre : mRencontre))
-        document.querySelector('#alerte').appendChild(document.createElement("h2")).innerText = hRencontre + 'h' + (mRencontre < 10 ? '0' +mRencontre : mRencontre);
+        document.querySelector('#alerte').appendChild(document.createElement("h2")).innerText ='RDV : ' + hRencontre + 'h' + (mRencontre < 10 ? '0' +mRencontre : mRencontre);
         estimation.forEach(x=> {
-            heureEstimation = heureRencontre - x[1]
+            heureEstimation = heureRencontre - x[2]
             heureEstimation = Math.trunc(heureEstimation/60) + "h" + (Math.trunc(heureEstimation%60) < 10 ? "0" +Math.trunc(heureEstimation%60) : Math.trunc(heureEstimation%60))
-            let alerte = document.getElementById("alerte")
-            let newAlerte = document.createElement('p')
-            var alerteText = document.createTextNode(x[0] + " doit partir a " + heureEstimation);
-            newAlerte.appendChild(alerteText)
-            alerte.appendChild(newAlerte)
+            document.getElementById("alerte").appendChild(document.createElement('p')).innerText = x[0] + " doit partir a " + heureEstimation;
         })
         firsttry ? document.querySelector('#modal').style.opacity = 0 : document.querySelector('#modal').style.opacity = 1
         setTimeout(function () {
             document.querySelector('#modal').style.opacity = 0;
-        }, 2000);
+        }, 1000);
         firsttry = false
     }
     estimate()
