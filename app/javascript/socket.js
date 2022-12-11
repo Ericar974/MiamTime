@@ -17,7 +17,7 @@ socket.on('chat message', function (msg) {
     let item = document.createElement('li');
     //console.log(msg)
     //react
-    if (msg.match(/\/changeHour \d{1,2}h\d\d/)) {
+    if (msg.match(/\/changeHour [0-23]{1,2}h[0-59]\d\d$/)) {
         hRencontre = parseInt(msg.match(/\/changeHour (\d{1,2})h\d\d/)[1])
         mRencontre = parseInt(msg.match(/\/changeHour \d{1,2}h(\d\d)/)[1])
         //refresh the page
