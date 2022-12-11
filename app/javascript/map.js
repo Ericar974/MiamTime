@@ -14,6 +14,7 @@ let r
 let lieu
 let newMarker2
 let layerGroup
+let tempsRestant
 
 function displayPersoWalk(personnages, restaurants) {
     estimate()
@@ -27,8 +28,9 @@ function displayPersoWalk(personnages, restaurants) {
             shadowSize: [0, 0]
         });
         layerGroup.addLayer(newMarker);
-        console.log(personnages[i].heure)
-        newMarker.bindPopup("<b>Salut !</b><br>Moi c'est " + personnages[i].name + " et " + personnages[i].heure);
+        console.log(heureRencontre)
+        tempsRestant = heureRencontre - (parseInt(personnages[i].heure.split('h')[0])*60 + parseInt(personnages[i].heure.split('h')[1]))
+        newMarker.bindPopup("<b>" + personnages[i].name + "</b><br>Mon trajet dure: " + tempsRestant + 'min');
 
         newMarker.on('dragend', function (event) {
             map.removeLayer(layerGroup)

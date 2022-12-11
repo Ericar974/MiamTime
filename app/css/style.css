@@ -64,7 +64,7 @@ body {
     color: #fff;
 }
 #form > p:hover{
-
+    cursor: pointer;
 }
 #messages {
     list-style-type: none;

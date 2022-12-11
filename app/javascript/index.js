@@ -194,10 +194,7 @@ function positione() {
         position(persos[perso], persos[perso].resto)
     }
 }
-
 //Action pour lancer les fonctions
-
-
 //results.forEach(x=> console.log(x))
 //console.log du rendu de l'estimation
 let heureEstimation
